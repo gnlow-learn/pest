@@ -1,0 +1,22 @@
+char        = { 'a'..'z' | 'A'..'Z' }
+digit		= { ASCII_DIGIT }
+name        = @{ char+ }
+value       = @{ digit+ }
+property    = { name ~ "=" ~ expr }
+
+expr = _{ property | value | name | identation ~ lines }
+
+item = _{ expr }
+
+WHITESPACE = _{ " " }
+
+lists = { lines ~ EOI }
+lines = { line ~ (next_line)* }
+line = _{ item ~ (children)? }
+next_line = _{ identation ~ line }
+
+identation = ${ "\n" ~ PEEK_ALL }
+identation_push = ${ identation ~ PUSH(space) }
+
+space = _{ (" " | "\t")+ }
+children = { identation_push ~ lines ~ DROP }
