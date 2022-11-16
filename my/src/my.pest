@@ -1,18 +1,27 @@
 char        = { 'a'..'z' | 'A'..'Z' }
-digit		= { ASCII_DIGIT }
+num		    = { ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
 name        = @{ char+ }
-value       = @{ digit+ }
+value       = { num }
+suffixed    = ${ value ~ expr }
 property    = { name ~ "=" ~ expr }
 
-expr = _{ property | value | name | identation ~ lines }
+expr = _{
+	  property
+    | eval
+    | suffixed
+    | value
+    | name
+    | identation ~ lines
+    | "(" ~ expr ~ ")"
+}
 
-item = _{ expr }
+eval = { name ~ expr }
 
 WHITESPACE = _{ " " }
 
 lists = { lines ~ EOI }
 lines = { line ~ (next_line)* }
-line = _{ item ~ (children)? }
+line = _{ expr ~ (children)? }
 next_line = _{ identation ~ line }
 
 identation = ${ "\n" ~ PEEK_ALL }
