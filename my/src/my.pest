@@ -1,9 +1,9 @@
 char        = { 'a'..'z' | 'A'..'Z' }
-num		    = { ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
+num		    = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
 name        = @{ char+ }
 value       = _{ num }
 suffixed    = ${ value ~ expr }
-property    = { name ~ "=" ~ expr }
+infix    = { expr_proto ~ "=" ~ expr }
 
 eval = { name ~ expr }
 
@@ -11,7 +11,12 @@ doc = { lines ~ EOI }
 
 expr = _{
     children
-	| property
+    | eval
+	| infix
+    | expr_proto
+}
+expr_proto = _{
+    children
     | eval
     | suffixed
     | value
