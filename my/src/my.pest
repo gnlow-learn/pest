@@ -1,27 +1,30 @@
 char        = { 'a'..'z' | 'A'..'Z' }
 num		    = { ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT+)? }
 name        = @{ char+ }
-value       = { num }
+value       = _{ num }
 suffixed    = ${ value ~ expr }
 property    = { name ~ "=" ~ expr }
 
+eval = { name ~ expr }
+
+doc = { lines ~ EOI }
+
 expr = _{
-	  property
+    children
+	| property
     | eval
     | suffixed
     | value
     | name
-    | identation ~ lines
     | "(" ~ expr ~ ")"
 }
 
-eval = { name ~ expr }
+// Indent
 
 WHITESPACE = _{ " " }
 
-lists = { lines ~ EOI }
 lines = { line ~ (next_line)* }
-line = _{ expr ~ (children)? }
+line = _{ expr ~ (expr)? }
 next_line = _{ identation ~ line }
 
 identation = ${ "\n" ~ PEEK_ALL }
